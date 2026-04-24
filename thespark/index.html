@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Add .js early, before first paint, to avoid flash-of-visible-content before anime hides reveals -->
+<script>document.documentElement.classList.add('js');</script>
 <title>The Launch and The Spark: A Centennial Celebration of the Harlem Renaissance</title>
 <meta name="description" content="A centennial celebration of the Harlem Renaissance, honoring Jessie Redmon Fauset. Presented by The Literary Society. New York City, April 16–29, 2026." />
 
@@ -1135,8 +1137,7 @@
 <!-- anime.js for elegant, soft motion -->
 <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <script>
-  // Flag .js on <html> so CSS can apply initial-hidden states only when JS is available
-  document.documentElement.classList.add('js');
+  // (.js class already added early in <head> to prevent flash)
 
   // Sticky header subtle state
   (function () {
@@ -1185,7 +1186,7 @@
         targets: el,
         opacity: [0, 1],
         translateY: [DRIFT, 0],
-        duration: 1700,
+        duration: 2200,
         easing: SOFT_EASE
       });
     }
@@ -1195,8 +1196,8 @@
         targets: container.children,
         opacity: [0, 1],
         translateY: [DRIFT, 0],
-        duration: 1500,
-        delay: anime.stagger(180, { start: 100 }),
+        duration: 2000,
+        delay: anime.stagger(240, { start: 140 }),
         easing: SOFT_EASE
       });
     }
@@ -1206,7 +1207,7 @@
       anime({
         targets: fig,
         opacity: [0, 1],
-        duration: 2000,
+        duration: 2600,
         easing: SOFT_EASE
       });
       var img = fig.querySelector('img');
@@ -1214,7 +1215,7 @@
         anime({
           targets: img,
           scale: [1.04, 1],
-          duration: 2800,
+          duration: 3600,
           easing: 'cubicBezier(0.22, 1, 0.36, 1)'
         });
       }
