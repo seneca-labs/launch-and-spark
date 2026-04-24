@@ -89,16 +89,18 @@
   .container { max-width: var(--max-w); margin: 0 auto; padding-left: var(--pad-x); padding-right: var(--pad-x); }
 
   /* ---------- Top bar ---------- */
+  /* No backdrop-filter: it would create a containing block for fixed
+     descendants, which would trap .primary-nav (a child of .topbar) to
+     the topbar's bounds — causing the full-viewport menu overlay to only
+     cover the topbar strip on mobile. */
   .topbar {
     position: sticky; top: 0; z-index: 130;
-    background: rgba(255, 255, 255, 0.84);
-    backdrop-filter: saturate(140%) blur(10px);
-    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    background: rgba(255, 255, 255, 0.94);
     border-bottom: 1px solid transparent;
     transition: background 400ms var(--ease), border-color 400ms var(--ease);
   }
   .topbar.is-scrolled {
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.98);
     border-bottom-color: var(--rule);
   }
   .topbar-inner {
@@ -226,8 +228,6 @@
   body.nav-open .topbar {
     background: transparent;
     border-bottom-color: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     z-index: 136; /* above primary-nav (135) so wordmark stays visible */
   }
   /* Hide the page content behind the menu. Applied only while the menu
