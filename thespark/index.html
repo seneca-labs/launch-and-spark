@@ -176,7 +176,7 @@
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 500ms var(--ease);
+      transition: opacity 650ms var(--ease);
       z-index: 135; /* above .topbar (130); .nav-toggle stays at 140 */
       padding: 96px 24px 80px;
     }
@@ -206,6 +206,15 @@
     .primary-nav.is-open .nav-list li:nth-child(4) a { transition-delay: 330ms; }
     .primary-nav.is-open .nav-list li:nth-child(5) a { transition-delay: 410ms; }
     .primary-nav.is-open .nav-list li:nth-child(6) a { transition-delay: 490ms; }
+
+    /* While the menu is closing (after a link tap), fade the list items out
+       quickly so the surface is a clean white wash while the scroll runs. */
+    .primary-nav.is-closing .nav-list a {
+      opacity: 0 !important;
+      transform: translateY(-4px) !important;
+      transition: opacity 380ms var(--ease), transform 380ms var(--ease) !important;
+      transition-delay: 0ms !important;
+    }
   }
   @media (max-width: 480px) {
     .topbar-inner { padding-top: 14px; padding-bottom: 14px; }
@@ -1337,12 +1346,12 @@
       return (topbar ? topbar.offsetHeight : 0) + 24;
     }
 
-    function scrollTo(y, done) {
+    function scrollTo(y, done, duration) {
       var obj = { y: window.scrollY };
       anime({
         targets: obj,
         y: y,
-        duration: 1900,
+        duration: duration || 1900,
         easing: 'cubicBezier(0.65, 0, 0.35, 1)',
         update: function () { window.scrollTo(0, obj.y); },
         complete: function () { if (done) done(); }
@@ -1366,17 +1375,32 @@
       var target = document.querySelector(href);
       if (!target) return;
       e.preventDefault();
-
-      // Is the mobile nav currently open? If so, keep it open as a white cover
-      // during the scroll tween, then close it at the end so there's no flash
-      // of the page at its old scroll position.
-      var navOpen = !!document.querySelector('.primary-nav.is-open');
+      history.pushState(null, '', href);
 
       var rect = target.getBoundingClientRect();
       var y = Math.max(0, rect.top + window.scrollY - getOffset());
-      scrollTo(y, function () { if (navOpen) closeNav(); });
-      if (!navOpen) closeNav();
-      history.pushState(null, '', href);
+
+      var nav = document.querySelector('.primary-nav.is-open');
+      if (!nav) {
+        // Desktop, or menu already closed — just scroll.
+        scrollTo(y);
+        return;
+      }
+
+      // Mobile menu is open. Sequence so nothing cross-fades:
+      //   1. Fade menu links out (380ms) — surface stays pure white.
+      //   2. Scroll tween runs silently behind the white cover (1600ms).
+      //   3. White surface fades out (650ms), revealing destination cleanly.
+      nav.classList.add('is-closing');
+
+      setTimeout(function () {
+        // Silent scroll under the white cover — can run faster since it is unseen.
+        scrollTo(y, function () {
+          closeNav(); // removes is-open + nav-open -> white fades, visibility returns
+          // Clean up the closing state once the fade is done so next open is fresh.
+          setTimeout(function () { nav.classList.remove('is-closing'); }, 700);
+        }, 1100);
+      }, 380);
     });
   })();
 </script>
