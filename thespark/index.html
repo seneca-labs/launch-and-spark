@@ -216,53 +216,58 @@
 
   /* ---------- Hero ---------- */
   .hero {
-    padding: clamp(48px, 8vw, 120px) 0 clamp(40px, 6vw, 80px);
+    padding: clamp(24px, 6vw, 120px) 0 clamp(32px, 6vw, 80px);
   }
   .hero-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 24px;
-    font-size: 12px;
+    gap: 6px 20px;
+    font-size: 11px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--mute);
-    margin-bottom: 40px;
+    margin-bottom: clamp(20px, 3vw, 40px);
   }
   .hero-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 48px;
+    gap: 24px;
     align-items: end;
   }
   @media (min-width: 900px) {
     .hero-grid { grid-template-columns: 1.3fr 1fr; gap: 64px; }
   }
+  /* On mobile, cap hero image height so it peeks above the fold */
+  @media (max-width: 700px) {
+    .hero-visual { max-width: 260px; margin: 0 auto; justify-self: center; }
+    .hero-frame { aspect-ratio: 4 / 5; }
+  }
   .hero-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(44px, 8vw, 110px);
+    font-size: clamp(38px, 8vw, 110px);
     line-height: 0.98;
     letter-spacing: -0.015em;
-    margin: 0 0 28px;
+    margin: 0 0 clamp(16px, 2.2vw, 28px);
   }
   .hero-title em {
     font-style: italic;
   }
   .hero-sub {
     font-style: normal;
-    font-size: clamp(19px, 2.1vw, 24px);
+    font-size: clamp(17px, 2.1vw, 24px);
     line-height: 1.45;
     color: var(--ink-soft);
-    margin: 0 0 36px;
+    margin: 0 0 clamp(20px, 2.8vw, 36px);
     max-width: 34ch;
   }
   .hero-tagline {
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    padding-top: 24px;
+    padding-top: clamp(16px, 2vw, 24px);
     border-top: 1px solid var(--rule);
-    margin: 0 0 32px;
+    margin: 0 0 clamp(18px, 2.4vw, 32px);
     max-width: 36ch;
     color: var(--ink);
   }
@@ -356,12 +361,15 @@
   }
   .story-images {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
   @media (min-width: 700px) {
-    .story-images { grid-template-columns: 1fr 1fr; }
+    .story-images { gap: 24px; }
   }
+  /* Full image, no crop, soft background */
+  .story-images .tile-frame { background: var(--cream-2); }
+  .story-images .tile-frame img { object-fit: contain; }
 
   /* Image + caption tile (portfolio style) */
   .tile { display: block; }
@@ -595,10 +603,10 @@
   /* ---------- Scholars ---------- */
   .scholars-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 48px 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 16px;
   }
-  @media (min-width: 640px) { .scholars-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 640px) { .scholars-grid { gap: 48px 24px; } }
   @media (min-width: 1000px) { .scholars-grid { grid-template-columns: repeat(4, 1fr); } }
 
   /* ---------- About the Society ---------- */
@@ -749,7 +757,7 @@
 <header class="topbar" id="topbar">
   <div class="container topbar-inner">
     <a class="topbar-left" href="#top" aria-label="The Launch and The Spark, home">The Launch &amp; The Spark</a>
-    <nav class="topbar-center" aria-label="Primary">
+    <nav class="primary-nav" id="primary-nav" aria-label="Primary">
       <ul class="nav-list">
         <li><a href="#story">Story</a></li>
         <li><a href="#events">Events</a></li>
@@ -759,6 +767,9 @@
       </ul>
     </nav>
     <span class="topbar-right">April 16–29, 2026</span>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
@@ -1086,11 +1097,8 @@
         <p>The Society has gained a reputation for occasionally developing public programming to engage broader audiences. The most recent was the 2022 staging of <em>The Wedding Reception: An Artful Imagining of the 1838 Wedding of Anna Murray and Frederick Douglass.</em></p>
         <p class="about-refs">
           As featured in
-          <!-- PLACEHOLDER: NYT article URL for "Is This the Most Notable (Purple) Wedding Dress Ever Worn?" -->
+          <!-- PLACEHOLDER: final NYT article URL to be confirmed -->
           <a href="#" target="_blank" rel="noopener">The New York Times</a>
-          <span aria-hidden="true">·</span>
-          <!-- PLACEHOLDER: Black Design Collective feature URL -->
-          <a href="#" target="_blank" rel="noopener">Black Design Collective</a>
         </p>
       </div>
     </div>
@@ -1138,6 +1146,34 @@
 <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 <script>
   // (.js class already added early in <head> to prevent flash)
+
+  // Hamburger menu — open/close with scroll lock
+  (function () {
+    var toggle = document.querySelector('.nav-toggle');
+    var nav = document.getElementById('primary-nav');
+    if (!toggle || !nav) return;
+
+    function setOpen(open) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      nav.classList.toggle('is-open', open);
+      document.body.classList.toggle('nav-open', open);
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Escape closes
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Closing on link click handled by the smooth-scroll handler below
+  })();
 
   // Sticky header subtle state
   (function () {
