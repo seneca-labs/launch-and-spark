@@ -222,8 +222,16 @@
 
   body.nav-open { overflow: hidden; }
   /* When menu is open, topbar backdrop becomes transparent so the menu's
-     solid-white surface is the only thing the eye registers. */
-  body.nav-open .topbar { background: transparent; border-bottom-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+     solid-white surface is the only thing the eye registers. The topbar
+     itself is raised above the menu so the wordmark ("The Launch & The
+     Spark") remains visible over the white surface. */
+  body.nav-open .topbar {
+    background: transparent;
+    border-bottom-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    z-index: 136; /* above primary-nav (135) */
+  }
   /* Belt-and-braces: hide everything behind the menu so there is no chance
      of bleed-through regardless of compositing/backdrop quirks. */
   body.nav-open main,
