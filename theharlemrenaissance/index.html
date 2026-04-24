@@ -211,6 +211,9 @@
   }
 
   body.nav-open { overflow: hidden; }
+  /* When menu is open, topbar backdrop becomes transparent so the menu's
+     solid-white surface is the only thing the eye registers. */
+  body.nav-open .topbar { background: transparent; border-bottom-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
 
   /* ---------- Hero ---------- */
   .hero {
