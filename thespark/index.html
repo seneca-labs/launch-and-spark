@@ -267,6 +267,10 @@
   .hero-visual {
     display: block;
     margin: 0;
+    width: 100%;
+    max-width: 380px;
+    justify-self: end;
+    align-self: end;
   }
   .hero-frame {
     aspect-ratio: 3 / 4;
@@ -1181,7 +1185,7 @@
         targets: el,
         opacity: [0, 1],
         translateY: [DRIFT, 0],
-        duration: 2400,
+        duration: 3200,
         easing: SOFT_EASE
       });
     }
@@ -1191,8 +1195,8 @@
         targets: container.children,
         opacity: [0, 1],
         translateY: [DRIFT, 0],
-        duration: 2200,
-        delay: anime.stagger(220, { start: 120 }),
+        duration: 2800,
+        delay: anime.stagger(340, { start: 180 }),
         easing: SOFT_EASE
       });
     }
@@ -1202,7 +1206,7 @@
       anime({
         targets: fig,
         opacity: [0, 1],
-        duration: 2800,
+        duration: 3600,
         easing: SOFT_EASE
       });
       var img = fig.querySelector('img');
@@ -1210,7 +1214,7 @@
         anime({
           targets: img,
           scale: [1.04, 1],
-          duration: 4200,
+          duration: 5400,
           easing: 'cubicBezier(0.22, 1, 0.36, 1)'
         });
       }
