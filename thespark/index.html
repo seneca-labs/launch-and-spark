@@ -1337,15 +1337,25 @@
       return (topbar ? topbar.offsetHeight : 0) + 24;
     }
 
-    function scrollTo(y) {
+    function scrollTo(y, done) {
       var obj = { y: window.scrollY };
       anime({
         targets: obj,
         y: y,
         duration: 1900,
         easing: 'cubicBezier(0.65, 0, 0.35, 1)',
-        update: function () { window.scrollTo(0, obj.y); }
+        update: function () { window.scrollTo(0, obj.y); },
+        complete: function () { if (done) done(); }
       });
+    }
+
+    function closeNav() {
+      var nav = document.querySelector('.primary-nav.is-open');
+      if (!nav) return;
+      nav.classList.remove('is-open');
+      document.body.classList.remove('nav-open');
+      var toggle = document.querySelector('.nav-toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
     }
 
     document.addEventListener('click', function (e) {
@@ -1356,17 +1366,16 @@
       var target = document.querySelector(href);
       if (!target) return;
       e.preventDefault();
-      // Close mobile nav if open
-      var nav = document.querySelector('.primary-nav.is-open');
-      if (nav) {
-        nav.classList.remove('is-open');
-        document.body.classList.remove('nav-open');
-        var toggle = document.querySelector('.nav-toggle');
-        if (toggle) toggle.setAttribute('aria-expanded', 'false');
-      }
+
+      // Is the mobile nav currently open? If so, keep it open as a white cover
+      // during the scroll tween, then close it at the end so there's no flash
+      // of the page at its old scroll position.
+      var navOpen = !!document.querySelector('.primary-nav.is-open');
+
       var rect = target.getBoundingClientRect();
       var y = Math.max(0, rect.top + window.scrollY - getOffset());
-      scrollTo(y);
+      scrollTo(y, function () { if (navOpen) closeNav(); });
+      if (!navOpen) closeNav();
       history.pushState(null, '', href);
     });
   })();
