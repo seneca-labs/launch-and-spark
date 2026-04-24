@@ -1185,7 +1185,7 @@
         targets: el,
         opacity: [0, 1],
         translateY: [DRIFT, 0],
-        duration: 3200,
+        duration: 1700,
         easing: SOFT_EASE
       });
     }
@@ -1195,8 +1195,8 @@
         targets: container.children,
         opacity: [0, 1],
         translateY: [DRIFT, 0],
-        duration: 2800,
-        delay: anime.stagger(340, { start: 180 }),
+        duration: 1500,
+        delay: anime.stagger(180, { start: 100 }),
         easing: SOFT_EASE
       });
     }
@@ -1206,7 +1206,7 @@
       anime({
         targets: fig,
         opacity: [0, 1],
-        duration: 3600,
+        duration: 2000,
         easing: SOFT_EASE
       });
       var img = fig.querySelector('img');
@@ -1214,7 +1214,7 @@
         anime({
           targets: img,
           scale: [1.04, 1],
-          duration: 5400,
+          duration: 2800,
           easing: 'cubicBezier(0.22, 1, 0.36, 1)'
         });
       }
