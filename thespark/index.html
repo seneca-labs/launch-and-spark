@@ -171,25 +171,54 @@
     .nav-toggle { display: flex; }
 
     .primary-nav {
-      /* Use explicit coords (not `inset: 0`) for broader Safari support,
-         plus width/height fallbacks so the surface always fills the
-         viewport even if one anchor fails to resolve. */
+      /* Explicit coords + vw/dvh fallbacks for broader Safari support. */
       position: fixed;
       top: 0; right: 0; bottom: 0; left: 0;
       width: 100vw; height: 100vh; height: 100dvh;
-      background: #FFFFFF;
+      background: transparent; /* white comes from the two pseudo surfaces below */
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0;
       pointer-events: none;
-      transition: opacity 650ms var(--ease);
       z-index: 135; /* above .topbar (130); .nav-toggle stays at 140 */
       padding: 96px 24px 80px;
     }
-    .primary-nav.is-open {
-      opacity: 1;
-      pointer-events: auto;
+    /* Two stacked surfaces make up the white cover:
+         ::before = the topbar strip (height matches the topbar)
+         ::after  = the body area (everything below the topbar)
+       Splitting lets the close animation fade the topbar strip away first,
+       revealing the topbar + its own white backdrop, then fade the body
+       strip, revealing the destination page content. */
+    .primary-nav::before,
+    .primary-nav::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      background: #FFFFFF;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+      transition: opacity 650ms var(--ease);
+    }
+    .primary-nav::before {
+      top: 0;
+      height: var(--topbar-h, 77px);
+    }
+    .primary-nav::after {
+      top: var(--topbar-h, 77px);
+      bottom: 0;
+    }
+    .primary-nav.is-open { pointer-events: auto; }
+    .primary-nav.is-open::before,
+    .primary-nav.is-open::after { opacity: 1; }
+    /* Staggered exit: top strip first (revealing topbar), then body strip. */
+    .primary-nav.is-exiting::before {
+      opacity: 0;
+      transition: opacity 350ms var(--ease);
+    }
+    .primary-nav.is-exiting::after {
+      opacity: 0;
+      transition: opacity 500ms var(--ease) 250ms;
     }
     .primary-nav .nav-list {
       flex-direction: column;
@@ -227,13 +256,19 @@
     .topbar-inner { padding-top: 14px; padding-bottom: 14px; }
   }
 
-  /* Scroll-lock + raise topbar above menu surface. Applied immediately
-     on tap and kept until the close sequence fully completes. */
+  /* Scroll-lock + raise topbar above menu surface. Applied throughout the
+     whole menu lifecycle (open + close) so the wordmark stays visible. */
   body.nav-open { overflow: hidden; }
-  body.nav-open .topbar {
+  body.nav-open .topbar { z-index: 136; /* above primary-nav (135) */ }
+  /* Topbar's own white backdrop is hidden only while the menu's white cover
+     is fully opaque. At the *start* of the close sequence we remove this
+     class so the topbar's backdrop fades back in (via the existing
+     `transition: background 400ms` on .topbar), appearing *before* the
+     menu surfaces finish fading out — the topbar arrives first, then the
+     destination section reveals. */
+  body.nav-clear .topbar {
     background: transparent;
     border-bottom-color: transparent;
-    z-index: 136; /* above primary-nav (135) so wordmark stays visible */
   }
   /* Hide the page content behind the menu. Applied only while the menu
      is fully opaque — added after the open-fade completes, removed before
@@ -1189,13 +1224,24 @@
     var nav = document.getElementById('primary-nav');
     if (!toggle || !nav) return;
 
-    // Phase durations (must match CSS transitions on .primary-nav and
-    // .primary-nav.is-closing .nav-list a).
-    var SURFACE_MS = 650;   // primary-nav opacity transition
-    var LINKS_MS   = 380;   // .is-closing links fade-out
+    // Phase durations (must match CSS transitions).
+    var SURFACE_FULL_OPEN_MS = 650; // primary-nav fade-in before content is hidden
+    var LINKS_MS = 380;             // .is-closing links fade-out
+    var SURFACE_EXIT_MS = 800;      // staggered ::before (350) + ::after (250+500)
 
-    var coverTimer = null;  // schedules adding .nav-covered after open fade
-    var busy = false;       // guards against re-entrant taps mid-transition
+    var coverTimer = null;
+    var busy = false;
+
+    // Measure topbar height so the two surfaces (::before = topbar strip,
+    // ::after = body strip) align perfectly. Keep it in sync on resize.
+    var topbar = document.getElementById('topbar');
+    function syncTopbarH() {
+      if (!topbar) return;
+      var h = topbar.offsetHeight;
+      if (h > 0) document.documentElement.style.setProperty('--topbar-h', h + 'px');
+    }
+    syncTopbarH();
+    window.addEventListener('resize', syncTopbarH);
 
     function isOpen() {
       return nav.classList.contains('is-open');
@@ -1206,51 +1252,64 @@
       busy = true;
       toggle.setAttribute('aria-expanded', 'true');
       toggle.setAttribute('aria-label', 'Close menu');
-      // Scroll-lock + topbar raised immediately so the wordmark floats above
-      // the incoming white surface throughout the fade-in.
+      syncTopbarH();
+      // Scroll-lock + topbar raised above the menu (wordmark stays visible).
+      // `nav-clear` hides the topbar's own white backdrop while the menu
+      // surfaces are solid — so during open we don't see a double-white seam
+      // between topbar and menu.
       document.body.classList.add('nav-open');
+      document.body.classList.add('nav-clear');
+      nav.classList.remove('is-exiting');
       nav.classList.remove('is-closing');
-      nav.classList.add('is-open'); // starts 650ms opacity fade from 0 -> 1
-      // Only hide the page content once the menu is fully opaque — prevents
-      // a gap where content has vanished but the surface isn't there yet.
+      nav.classList.add('is-open'); // surfaces fade in over 650ms
+      // Hide page content once the menu is fully opaque (no visible flip).
       coverTimer = setTimeout(function () {
         document.body.classList.add('nav-covered');
         busy = false;
-      }, SURFACE_MS);
+      }, SURFACE_FULL_OPEN_MS);
     }
 
     // Close sequence. `afterLinksFade` is an optional callback invoked once
-    // the link items have faded out but before the surface fades — used by
+    // the link items have faded out but before the surfaces fade — used by
     // the smooth-scroll handler to run a silent scroll behind the still-
     // opaque white cover.
     function close(afterLinksFade) {
       if (!isOpen() && !document.body.classList.contains('nav-open')) return;
-      // Cancel any pending cover addition from a just-started open.
       if (coverTimer) { clearTimeout(coverTimer); coverTimer = null; }
       busy = true;
       toggle.setAttribute('aria-expanded', 'false');
       toggle.setAttribute('aria-label', 'Open menu');
 
-      // Phase 1: fade link items out (380ms). Surface stays solid white.
+      // Phase 1: fade link items out (380ms). Surfaces stay solid white.
       nav.classList.add('is-closing');
 
       setTimeout(function () {
         function fadeSurface() {
-          // Phase 3: unhide content behind the still-opaque surface, then
-          // fade the surface out to reveal it.
+          // Phase 3: unhide content behind the still-opaque surface.
           document.body.classList.remove('nav-covered');
+          // Phase 3a: topbar's white backdrop begins fading IN now
+          // (removes `nav-clear` → .topbar background transitions from
+          // transparent to rgba(255,255,255,0.94) over 400ms). This
+          // happens *before* the menu surfaces finish fading out, so the
+          // topbar appears first as a distinct element.
+          document.body.classList.remove('nav-clear');
+          // Phase 3b: staggered surface fade-out via .is-exiting —
+          //   ::before (topbar strip) clears first (350ms)
+          //   ::after  (body strip) clears after a 250ms delay (500ms)
           nav.classList.remove('is-open');
+          nav.classList.add('is-exiting');
           setTimeout(function () {
             // Phase 4: cleanup.
             document.body.classList.remove('nav-open');
+            nav.classList.remove('is-exiting');
             nav.classList.remove('is-closing');
             busy = false;
-          }, SURFACE_MS);
+          }, SURFACE_EXIT_MS);
         }
 
         if (typeof afterLinksFade === 'function') {
           // Phase 2: link-tap variant — run the silent scroll first, then
-          // fade the surface when it completes.
+          // fade the surfaces when it completes.
           afterLinksFade(fadeSurface);
         } else {
           fadeSurface();
