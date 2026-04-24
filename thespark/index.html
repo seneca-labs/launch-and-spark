@@ -11,9 +11,9 @@
 <meta property="og:title" content="The Launch and The Spark: A Centennial Celebration of the Harlem Renaissance" />
 <meta property="og:description" content="A centennial celebration of the Harlem Renaissance, honoring Jessie Redmon Fauset. Presented by The Literary Society. New York City, April 16–29, 2026." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://theliterarysociety.org/theharlemrenaissance" />
+<meta property="og:url" content="https://theliterarysociety.org/thespark" />
 <!-- PLACEHOLDER: og:image URL -->
-<meta property="og:image" content="https://theliterarysociety.org/theharlemrenaissance/og-image.jpg" />
+<meta property="og:image" content="https://theliterarysociety.org/thespark/og-image.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 
 <!-- Fonts: Times New Roman across the board -->
@@ -170,7 +170,7 @@
 
     .primary-nav {
       position: fixed; inset: 0;
-      background: var(--cream);
+      background: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -205,6 +205,7 @@
     .primary-nav.is-open .nav-list li:nth-child(3) a { transition-delay: 250ms; }
     .primary-nav.is-open .nav-list li:nth-child(4) a { transition-delay: 330ms; }
     .primary-nav.is-open .nav-list li:nth-child(5) a { transition-delay: 410ms; }
+    .primary-nav.is-open .nav-list li:nth-child(6) a { transition-delay: 490ms; }
   }
   @media (max-width: 480px) {
     .topbar-inner { padding-top: 14px; padding-bottom: 14px; }
@@ -214,6 +215,10 @@
   /* When menu is open, topbar backdrop becomes transparent so the menu's
      solid-white surface is the only thing the eye registers. */
   body.nav-open .topbar { background: transparent; border-bottom-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  /* Belt-and-braces: hide everything behind the menu so there is no chance
+     of bleed-through regardless of compositing/backdrop quirks. */
+  body.nav-open main,
+  body.nav-open footer { visibility: hidden; }
 
   /* ---------- Hero ---------- */
   .hero {
@@ -240,6 +245,11 @@
   }
   /* On mobile, cap hero image height so it peeks above the fold */
   @media (max-width: 700px) {
+    .hero { padding: 8px 0 clamp(24px, 5vw, 56px); }
+    .hero-meta { margin-bottom: 14px; }
+    .hero-title { margin-bottom: 12px; }
+    .hero-sub { margin-bottom: 18px; }
+    .hero-tagline { display: none; }
     .hero-visual { max-width: 260px; margin: 0 auto; justify-self: center; }
     .hero-frame { aspect-ratio: 4 / 5; }
   }
@@ -760,6 +770,7 @@
     <a class="topbar-left" href="#top" aria-label="The Launch and The Spark, home">The Launch &amp; The Spark</a>
     <nav class="primary-nav" id="primary-nav" aria-label="Primary">
       <ul class="nav-list">
+        <li><a href="#top">Home</a></li>
         <li><a href="#story">Story</a></li>
         <li><a href="#events">Events</a></li>
         <li><a href="#scholars">Scholars</a></li>
