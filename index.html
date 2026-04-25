@@ -9,22 +9,22 @@
 <meta property="og:title" content="The Literary Society" />
 <meta property="og:description" content="Our new home is coming soon. Current programming: The Launch and The Spark, a centennial celebration of the Harlem Renaissance, New York City, April 16–29, 2026." />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://theliterarysociety.org" />
 
 <style>
   :root {
     --cream: #FFFFFF;
-    --cream-2: #F7F5F0;
     --ink: #111111;
     --ink-soft: #2C2926;
     --mute: #6A6661;
     --rule: #E2DED4;
     --serif: "Times New Roman", Times, serif;
     --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-    --pad-x: clamp(18px, 4vw, 56px);
+    --pad-x: clamp(20px, 5vw, 80px);
+    --pad-y: clamp(40px, 7vw, 96px);
   }
-  html, body { overflow-x: clip; }
   *, *::before, *::after { box-sizing: border-box; }
-  html, body { height: 100%; }
+  html, body { height: 100%; overflow-x: clip; }
   body {
     margin: 0;
     background: var(--cream);
@@ -35,117 +35,140 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     display: flex; flex-direction: column;
+    min-height: 100vh;
   }
   a { color: inherit; text-decoration: none; }
 
-  .topbar {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    padding: 20px var(--pad-x);
-    font-size: 13px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--rule);
-  }
-  .topbar .left { justify-self: start; }
-  .topbar .center { justify-self: center; color: var(--mute); }
-  .topbar .right { justify-self: end; text-align: right; }
-  @media (max-width: 640px) {
-    .topbar { grid-template-columns: 1fr; gap: 6px; text-align: center; }
-    .topbar .left, .topbar .center, .topbar .right { justify-self: center; text-align: center; }
-  }
-
-  main {
+  .page {
     flex: 1;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    padding: 80px var(--pad-x);
-    text-align: center;
-    max-width: 780px;
-    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    align-items: center;
+    column-gap: clamp(40px, 6vw, 96px);
+    padding: var(--pad-y) var(--pad-x);
+    max-width: 1480px;
     width: 100%;
+    margin: 0 auto;
   }
 
-  h1 {
+  /* LEFT — wordmark */
+  .wordmark { align-self: center; }
+  .wordmark h1 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(44px, 8vw, 96px);
-    line-height: 1;
-    letter-spacing: -0.015em;
-    margin: 0 0 24px;
+    font-size: clamp(72px, 13.5vw, 200px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
   }
-  h1 em { font-style: italic; }
-
-  .lede {
-    font-style: italic;
-    font-size: clamp(19px, 2.2vw, 24px);
-    line-height: 1.4;
-    color: var(--ink-soft);
-    margin: 0 0 40px;
-    max-width: 32ch;
+  .wordmark h1 .word {
+    display: block;
   }
-
-  .rule {
-    width: 48px; height: 1px;
+  .wordmark .rule {
+    width: 96px;
+    height: 1px;
     background: var(--ink);
-    margin: 0 auto 40px;
     border: 0;
+    margin: clamp(40px, 6vw, 72px) 0 clamp(28px, 3vw, 40px);
+  }
+  .wordmark .tagline {
+    font-style: italic;
+    font-size: clamp(18px, 1.6vw, 22px);
+    color: var(--ink-soft);
+    margin: 0;
   }
 
+  /* RIGHT — feature card */
   .feature {
-    padding: 28px 0;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    text-align: left;
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto 40px;
+    align-self: center;
+    max-width: 520px;
+    justify-self: start;
   }
   .feature .kicker {
-    font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
     color: var(--mute);
-    margin: 0 0 10px;
+    margin: 0 0 14px;
   }
   .feature h2 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(24px, 3.2vw, 32px);
+    font-size: clamp(28px, 3vw, 40px);
     line-height: 1.15;
-    margin: 0 0 6px;
     letter-spacing: -0.005em;
+    margin: 0 0 10px;
   }
   .feature h2 em { font-style: italic; }
   .feature .meta {
-    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     color: var(--mute);
-    margin: 0 0 16px;
+    margin: 0 0 22px;
   }
-  .feature p {
-    font-size: 16px; line-height: 1.6; margin: 0 0 20px;
+  .feature p.lede {
+    font-size: 16px;
+    line-height: 1.65;
     color: var(--ink-soft);
+    margin: 0 0 28px;
   }
   .feature a.visit {
     display: inline-block;
-    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
-    border-bottom: 1px solid var(--ink); padding-bottom: 3px;
-    transition: opacity 160ms var(--ease);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 4px;
+    transition: opacity 200ms var(--ease);
   }
   .feature a.visit:hover { opacity: 0.6; }
+  .feature a.visit .arrow { display: inline-block; margin-left: 6px; }
 
+  /* FOOTER */
   footer {
     text-align: center;
-    padding: 24px var(--pad-x);
-    border-top: 1px solid var(--rule);
-    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 22px var(--pad-x);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     color: var(--mute);
   }
 
-  .fade-in { opacity: 0; animation: fadeUp 900ms var(--ease) forwards; }
+  /* Responsive */
+  @media (max-width: 900px) {
+    .page {
+      grid-template-columns: 1fr;
+      row-gap: clamp(40px, 8vw, 64px);
+      align-items: start;
+    }
+    .wordmark h1 { font-size: clamp(64px, 18vw, 140px); }
+    .feature { justify-self: start; max-width: 560px; }
+  }
+  @media (max-width: 520px) {
+    .wordmark h1 { font-size: clamp(56px, 22vw, 110px); }
+    .wordmark .rule { width: 64px; margin-top: clamp(28px, 8vw, 48px); }
+    .feature h2 { font-size: clamp(24px, 7vw, 32px); }
+  }
+
+  /* Reveal */
+  .fade-in { opacity: 0; animation: fadeUp 1100ms var(--ease) forwards; }
   .fade-in:nth-child(1) { animation-delay: 0ms; }
-  .fade-in:nth-child(2) { animation-delay: 120ms; }
-  .fade-in:nth-child(3) { animation-delay: 240ms; }
-  .fade-in:nth-child(4) { animation-delay: 360ms; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .fade-in:nth-child(2) { animation-delay: 140ms; }
+  .fade-in:nth-child(3) { animation-delay: 280ms; }
+  .word.fade-in:nth-child(1) { animation-delay: 0ms; }
+  .word.fade-in:nth-child(2) { animation-delay: 140ms; }
+  .word.fade-in:nth-child(3) { animation-delay: 280ms; }
+  .feature .fade-in:nth-child(1) { animation-delay: 420ms; }
+  .feature .fade-in:nth-child(2) { animation-delay: 520ms; }
+  .feature .fade-in:nth-child(3) { animation-delay: 600ms; }
+  .feature .fade-in:nth-child(4) { animation-delay: 680ms; }
+  .feature .fade-in:nth-child(5) { animation-delay: 760ms; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .fade-in { opacity: 1 !important; animation: none !important; transform: none !important; }
   }
@@ -153,25 +176,25 @@
 </head>
 <body>
 
-<div class="topbar">
-  <span class="left">The Literary Society</span>
-  <span class="center">Est. New York City</span>
-  <span class="right">2026</span>
-</div>
-
-<main>
-  <h1 class="fade-in">The Literary <em>Society.</em></h1>
-  <p class="lede fade-in">Our new home is coming soon.</p>
-  <hr class="rule fade-in" aria-hidden="true" />
-
-  <section class="feature fade-in" aria-labelledby="feature-title">
-    <p class="kicker">Currently Presenting</p>
-    <h2 id="feature-title">The Launch <em>and</em> The Spark</h2>
-    <p class="meta">April 16–29, 2026 · New York City</p>
-    <p>A centennial celebration of the Harlem Renaissance, honoring Jessie Redmon Fauset, the editor who sparked a generation. Ten programs across Harlem and Greenwich Village.</p>
-    <a class="visit" href="theharlemrenaissance/">Visit the Program →</a>
+<div class="page">
+  <section class="wordmark" aria-label="The Literary Society">
+    <h1>
+      <span class="word fade-in">The</span>
+      <span class="word fade-in">Literary</span>
+      <span class="word fade-in">Society</span>
+    </h1>
+    <hr class="rule fade-in" aria-hidden="true" />
+    <p class="tagline fade-in">Our new home is coming soon.</p>
   </section>
-</main>
+
+  <section class="feature" aria-labelledby="feature-title">
+    <p class="kicker fade-in">Currently Presenting</p>
+    <h2 id="feature-title" class="fade-in">The Launch <em>and</em> The Spark</h2>
+    <p class="meta fade-in">April 16–29, 2026 · New York City</p>
+    <p class="lede fade-in">A centennial celebration of the Harlem Renaissance, honoring Jessie Redmon Fauset, the editor who sparked a generation. Ten programs across Harlem and Greenwich Village.</p>
+    <a class="visit fade-in" href="theharlemrenaissance/">Visit the Program <span class="arrow">→</span></a>
+  </section>
+</div>
 
 <footer>
   © 2026 The Literary Society
